@@ -76,3 +76,44 @@ CREATE TABLE pagamentos (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+-- Dados de exemplo para teste
+
+INSERT INTO clientes (nome, telefone, email) VALUES
+('João Silva', '21999990001', 'joao@email.com'),
+('Maria Souza', '21999990002', 'maria@email.com'),
+('Carlos Lima', '21999990003', 'carlos@email.com');
+
+INSERT INTO categorias (nome) VALUES
+('Lanches'),
+('Bebidas'),
+('Sobremesas');
+
+INSERT INTO produtos (id_categoria, nome, descricao, preco) VALUES
+(1, 'X-Burguer', 'Pão, carne, queijo e molho especial', 18.00),
+(1, 'X-Salada', 'Pão, carne, queijo, alface e tomate', 20.00),
+(2, 'Refrigerante Lata', '350ml', 6.00),
+(2, 'Suco Natural', 'Copo 300ml', 8.00),
+(3, 'Pudim', 'Fatia de pudim caseiro', 10.00);
+
+INSERT INTO pedidos (id_cliente, status, tipo_entrega, observacoes, valor_total) VALUES
+(1, 'recebido', 'retirada', 'Sem cebola', 24.00),
+(2, 'em_preparo', 'entrega_local', 'Adicionar ketchup', 28.00),
+(3, 'entregue', 'retirada', NULL, 30.00);
+
+INSERT INTO itens_pedido (id_pedido, id_produto, quantidade, preco_unitario) VALUES
+(1, 1, 1, 18.00),
+(1, 3, 1, 6.00);
+
+INSERT INTO itens_pedido (id_pedido, id_produto, quantidade, preco_unitario) VALUES
+(2, 2, 1, 20.00),
+(2, 4, 1, 8.00);
+
+INSERT INTO itens_pedido (id_pedido, id_produto, quantidade, preco_unitario) VALUES
+(3, 1, 1, 18.00),
+(3, 3, 2, 6.00);
+
+INSERT INTO pagamentos (id_pedido, forma_pagamento, status_pagamento, data_pagamento, valor_pago) VALUES
+(1, 'pix', 'pago', CURRENT_TIMESTAMP, 24.00),
+(2, 'cartao', 'pendente', NULL, 28.00),
+(3, 'dinheiro', 'pago', CURRENT_TIMESTAMP, 30.00);
