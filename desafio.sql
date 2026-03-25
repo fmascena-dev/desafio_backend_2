@@ -1,0 +1,78 @@
+
+CREATE DATABASE lanchonete_db;
+
+CREATE TABLE clientes (
+    id_cliente SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    telefone VARCHAR(20) NOT NULL UNIQUE,
+    email VARCHAR(100) UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE categorias (
+    id_categoria SERIAL PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE produtos (
+    id_produto SERIAL PRIMARY KEY,
+    id_categoria INT NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    preco NUMERIC(10,2) NOT NULL CHECK (preco > 0),
+    ativo BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_produtos_categoria
+        FOREIGN KEY (id_categoria)
+        REFERENCES categorias(id_categoria)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE pedidos (
+    id_pedido SERIAL PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    data_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) NOT NULL CHECK (status IN ('recebido', 'em_preparo', 'pronto', 'entregue', 'cancelado')),
+    tipo_entrega VARCHAR(20) NOT NULL CHECK (tipo_entrega IN ('retirada', 'entrega_local')),
+    observacoes TEXT,
+    valor_total NUMERIC(10,2) DEFAULT 0 CHECK (valor_total >= 0),
+    CONSTRAINT fk_pedidos_cliente
+        FOREIGN KEY (id_cliente)
+        REFERENCES clientes(id_cliente)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE itens_pedido (
+    id_item_pedido SERIAL PRIMARY KEY,
+    id_pedido INT NOT NULL,
+    id_produto INT NOT NULL,
+    quantidade INT NOT NULL CHECK (quantidade > 0),
+    preco_unitario NUMERIC(10,2) NOT NULL CHECK (preco_unitario > 0),
+    subtotal NUMERIC(10,2) GENERATED ALWAYS AS (quantidade * preco_unitario) STORED,
+    CONSTRAINT fk_itens_pedido_pedido
+        FOREIGN KEY (id_pedido)
+        REFERENCES pedidos(id_pedido)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_itens_pedido_produto
+        FOREIGN KEY (id_produto)
+        REFERENCES produtos(id_produto)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE pagamentos (
+    id_pagamento SERIAL PRIMARY KEY,
+    id_pedido INT NOT NULL UNIQUE,
+    forma_pagamento VARCHAR(20) NOT NULL CHECK (forma_pagamento IN ('dinheiro', 'cartao', 'pix')),
+    status_pagamento VARCHAR(20) NOT NULL CHECK (status_pagamento IN ('pendente', 'pago', 'cancelado')),
+    data_pagamento TIMESTAMP,
+    valor_pago NUMERIC(10,2) NOT NULL CHECK (valor_pago >= 0),
+    CONSTRAINT fk_pagamentos_pedido
+        FOREIGN KEY (id_pedido)
+        REFERENCES pedidos(id_pedido)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
