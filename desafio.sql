@@ -117,3 +117,78 @@ INSERT INTO pagamentos (id_pedido, forma_pagamento, status_pagamento, data_pagam
 (1, 'pix', 'pago', CURRENT_TIMESTAMP, 24.00),
 (2, 'cartao', 'pendente', NULL, 28.00),
 (3, 'dinheiro', 'pago', CURRENT_TIMESTAMP, 30.00);
+
+-- Consultas dos dados de exemplos
+
+SELECT 
+    p.id_pedido,
+    c.nome AS cliente,
+    p.data_pedido,
+    p.status,
+    p.tipo_entrega,
+    p.valor_total
+FROM pedidos p
+JOIN clientes c ON p.id_cliente = c.id_cliente
+ORDER BY p.data_pedido DESC;
+
+SELECT
+    ip.id_pedido,
+    pr.nome AS produto,
+    ip.quantidade,
+    ip.preco_unitario,
+    ip.subtotal
+FROM itens_pedido ip
+JOIN produtos pr ON ip.id_produto = pr.id_produto
+WHERE ip.id_pedido = 1;
+
+SELECT
+    p.id_pedido,
+    c.nome AS cliente,
+    p.status,
+    pg.forma_pagamento,
+    pg.status_pagamento,
+    pg.valor_pago
+FROM pedidos p
+JOIN clientes c ON p.id_cliente = c.id_cliente
+LEFT JOIN pagamentos pg ON p.id_pedido = pg.id_pedido
+ORDER BY p.id_pedido;
+
+SELECT
+    c.nome,
+    COUNT(p.id_pedido) AS total_pedidos
+FROM clientes c
+LEFT JOIN pedidos p ON c.id_cliente = p.id_cliente
+GROUP BY c.nome
+ORDER BY total_pedidos DESC;
+
+SELECT
+    pr.nome AS produto,
+    SUM(ip.quantidade) AS total_vendido
+FROM itens_pedido ip
+JOIN produtos pr ON ip.id_produto = pr.id_produto
+GROUP BY pr.nome
+ORDER BY total_vendido DESC;
+
+SELECT
+    SUM(valor_pago) AS faturamento_total
+FROM pagamentos
+WHERE status_pagamento = 'pago';
+
+SELECT
+    p.id_pedido,
+    c.nome AS cliente,
+    p.status,
+    p.data_pedido
+FROM pedidos p
+JOIN clientes c ON p.id_cliente = c.id_cliente
+WHERE p.status IN ('recebido', 'em_preparo', 'pronto')
+ORDER BY p.data_pedido;
+
+SELECT
+    cat.nome AS categoria,
+    pr.nome AS produto,
+    pr.preco
+FROM produtos pr
+JOIN categorias cat ON pr.id_categoria = cat.id_categoria
+ORDER BY cat.nome, pr.nome;
+
